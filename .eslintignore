@@ -1,0 +1,7 @@
+/node_modules
+dist
+.dist
+/coverage
+/old
+syntax-error.js
+syntax-error.main.js
