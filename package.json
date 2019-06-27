@@ -1,6 +1,6 @@
 {
 	"name": "@dmail/server",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -30,6 +30,7 @@
 		"@jsenv/prettier-config": "1.0.0",
 		"@jsenv/prettier-check-project": "2.7.0",
 		"@jsenv/eslint-import-resolver": "4.6.0",
+		"@jsenv/operating-system-path": "2.1.0",
 		"@jsenv/codecov-upload": "1.6.0",
 		"@dmail/assert": "3.10.0",
 		"node-fetch": "2.3.0",
