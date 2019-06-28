@@ -19,11 +19,19 @@ import { colorizeResponseStatus } from "./colorizeResponseStatus.js"
 import { originAsString } from "./originAsString.js"
 import { listen, stopListening } from "./listen.js"
 import { createLogger, LOG_LEVEL_ERRORS_WARNINGS_AND_LOGS } from "./logger.js"
+import {
+  STOP_REASON_INTERNAL_ERROR,
+  STOP_REASON_PROCESS_SIGINT,
+  STOP_REASON_PROCESS_BEFORE_EXIT,
+  STOP_REASON_PROCESS_HANGUP_OR_DEATH,
+  STOP_REASON_PROCESS_DEATH,
+  STOP_REASON_PROCESS_EXIT,
+  STOP_REASON_NOT_SPECIFIED,
+} from "./stop-reasons.js"
 
 const killPort = import.meta.require("kill-port")
 
-const REASON_NOT_SPECIFIED = "not specified"
-const REASON_INTERNAL_ERROR = "internal error"
+const STATUS_TEXT_INTERNAL_ERROR = "internal error"
 
 // todo: provide an option like debugInternalError
 // which sends error.stack on 500 to the client
@@ -83,7 +91,7 @@ export const startServer = async ({
   const clientTracker = trackClients(nodeServer)
   registerCleanupCallback((reason) => {
     let responseStatus
-    if (reasonIsInternalError(reason)) {
+    if (reason === STOP_REASON_INTERNAL_ERROR) {
       responseStatus = 500
       // reason = 'shutdown because error'
     } else {
@@ -101,7 +109,7 @@ export const startServer = async ({
   const stoppedPromise = new Promise((resolve) => {
     stoppedResolve = resolve
   })
-  const stop = memoizeOnce(async (reason = REASON_NOT_SPECIFIED) => {
+  const stop = memoizeOnce(async (reason = STOP_REASON_NOT_SPECIFIED) => {
     status = "closing"
     log(`server stopped because ${reason}`)
 
@@ -126,8 +134,11 @@ export const startServer = async ({
 
   if (stopOnError) {
     const unregister = requestHandlerTracker.add((nodeRequest, nodeResponse) => {
-      if (nodeResponse.statusCode === 500 && reasonIsInternalError(nodeResponse.statusMessage)) {
-        stop(REASON_INTERNAL_ERROR)
+      if (
+        nodeResponse.statusCode === 500 &&
+        nodeResponse.statusMessage === STATUS_TEXT_INTERNAL_ERROR
+      ) {
+        stop(STOP_REASON_INTERNAL_ERROR)
       }
     })
     registerCleanupCallback(unregister)
@@ -135,14 +146,21 @@ export const startServer = async ({
 
   if (stopOnExit) {
     const unregister = registerUngaranteedProcessTeardown((reason) => {
-      stop(`process ${reason}`)
+      stop(
+        {
+          beforeExit: STOP_REASON_PROCESS_BEFORE_EXIT,
+          hangupOrDeath: STOP_REASON_PROCESS_HANGUP_OR_DEATH,
+          death: STOP_REASON_PROCESS_DEATH,
+          exit: STOP_REASON_PROCESS_EXIT,
+        }[reason],
+      )
     })
     registerCleanupCallback(unregister)
   }
 
   if (stopOnSIGINT) {
     const unregister = registerProcessInterruptCallback(() => {
-      stop("process sigint")
+      stop(STOP_REASON_PROCESS_SIGINT)
     })
     registerCleanupCallback(unregister)
   }
@@ -210,7 +228,7 @@ export const startServer = async ({
 
       response = Object.freeze({
         status: 500,
-        statusText: REASON_INTERNAL_ERROR,
+        statusText: STATUS_TEXT_INTERNAL_ERROR,
         headers: {
           // ensure error are not cached
           "cache-control": "no-store",
@@ -260,8 +278,6 @@ callback: ${callback}`)
 }
 
 const statusToStatusText = (status) => STATUS_CODES[status] || "not specified"
-
-const reasonIsInternalError = (reason) => reason === REASON_INTERNAL_ERROR
 
 const getNodeServerAndAgent = ({ protocol, signature = {} }) => {
   if (protocol === "http") {
