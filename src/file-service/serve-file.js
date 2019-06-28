@@ -2,13 +2,19 @@ import { createReadStream } from "fs"
 import { folderRead, fileStat, fileRead } from "@dmail/helper"
 import { pathnameToOperatingSystemPath } from "@jsenv/operating-system-path"
 import { ressourceToPathname, ressourceToContentType } from "../ressource/index.js"
-import { contentTypeMap } from "./content-type-map.js"
+import { contentTypeMap as defaultContentTypeMap } from "./content-type-map.js"
 import { createETag } from "./etag.js"
 import { convertFileSystemErrorToResponseProperties } from "./convertFileSystemErrorToResponseProperties.js"
 
 export const serveFile = async (
   ressource,
-  { method = "GET", headers = {}, canReadDirectory = false, cacheStrategy = "mtime" } = {},
+  {
+    method = "GET",
+    headers = {},
+    canReadDirectory = false,
+    cacheStrategy = "mtime",
+    contentTypeMap = defaultContentTypeMap,
+  } = {},
 ) => {
   if (method !== "GET" && method !== "HEAD") {
     return {
