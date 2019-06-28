@@ -46,12 +46,10 @@ startServer({
   protocol: "http",
   ip: "127.0.0.1",
   port: 8080,
-  requestToResponse: (request) =>
-    serveFile(`${__dirname}${request.ressource}`, {
-      method: request.method,
-      headers: request.headers,
-      canReadDirectory: true,
-      cacheStrategy: "etag",
+  requestToResponse: ({ ressource, method, headers }) =>
+    serveFile(`${__dirname}${ressource}`, {
+      method,
+      headers,
     }),
 })
 ```
@@ -93,8 +91,8 @@ If you don't pass `port` option, its value will be:
 
 ### forcePort
 
-When true, server will kill any process currently listening the port is wants to listen.<br/>
-Do not pass this to true when port is `0` because it's be useless.<br />
+When true, server will kill any process currently listening the port it wants to listen.<br/>
+Passing `forcePort` to true when `port` is `0` will throw because it makes no sense.<br />
 
 If you don't pass `protocol` option, its value will be:
 
@@ -104,8 +102,8 @@ false
 
 ### requestToResponse(request)
 
-A function receiving a request object and responsible to produce a response object.<br />
-When `requestToResponse` returns `null` or `undefined` server will response to that request with `501 Not implemented`.
+A function receiving a `request` and responsible to produce a `response`.<br />
+When `requestToResponse` returns `null` or `undefined` server respond to that request with `501 Not implemented`.
 
 If you don't pass `requestToResponse`, the value will be
 
@@ -113,11 +111,9 @@ If you don't pass `requestToResponse`, the value will be
 const requestToResponse = () => null
 ```
 
-Below are more information on request and response objects.
+Below are more information on `request` and `response` objects.
 
 #### request
-
-A get request example:
 
 ```js
 const request = {
@@ -132,7 +128,7 @@ const request = {
 When request method is `GET` or `HEAD`, `request.body` is `undefined`.<br />
 When request method is `POST`, `PUT`, `PATCH`, `request.body` is an observable object.<br />
 
-Here is how you could read the request body:
+Here is how you could read `request.body`:
 
 ```js
 const requestToResponse = async ({ body }) => {
@@ -298,7 +294,7 @@ import {
 } from "@dmail/server"
 ```
 
-`reason` might also be a value you would pass yourself like this:
+`reason` might also be a value you passed yourself:
 
 ```js
 import { startServer } from "@dmail/server"
@@ -313,7 +309,7 @@ stop(42)
 
 ## `firstService`
 
-`firstService` helps you to create a complex `requestToResponse` function.
+`firstService` helps you to create complex `requestToResponse`.
 
 ```js
 import { firstService, startServer } from "@dmail/server"
