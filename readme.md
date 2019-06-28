@@ -311,10 +311,103 @@ const { stop } = await startServer({
 stop(42)
 ```
 
-## `serveFile`
-
-TODO: write documentation
-
 ## `firstService`
 
-TODO: write documentation
+`firstService` helps you to create a complex `requestToResponse` function.
+
+```js
+import { firstService, startServer } from "@dmail/server"
+
+startServer({
+  requestToResponse: ({ ressource, method, headers }) => {
+    return firstService(
+      () => {
+        if (ressource !== "/") return null
+        return {
+          status: 204,
+        }
+      },
+      () => {
+        if (ressource !== "/answer") return null
+        return {
+          status: 200,
+          headers: { "content-type": "text/plain" },
+          body: "answer is 42",
+        }
+      },
+    )
+  },
+})
+```
+
+The server above:
+
+- sends `204 no content` for `/`
+- sends `200 ok` with `answer is 42` body for `/answer`
+- sends `501 not implemented` for all other request
+
+`firstService` works like this:
+
+1. It accepts 0 or more function.<br />
+2. Set `serviceCandidate` to the first function<br />
+3. Calls `serviceCandidate` and awaits its `return value`.<br />
+4. If `return value` is a non null object it is returned.<br />
+   Otherwise, set `serviceCandidate` to the next function and go to step 3
+
+## `serveFile(ressource, options = {})`
+
+`serveFile` is an async function that will search for a file on your filesysten and produce a response for it.<br />
+Example:
+
+```js
+import { serveFile, defaultContentTypeMap } from "@dmail/server"
+
+const response = await serveFile("/Users/you/folder/index.html", {
+  method: "GET",
+  headers: {
+    "if-modified-since": "Wed, 21 Oct 2015 07:28:00 GMT",
+  },
+  cacheStrategy: "mtime",
+  contentTypeMap: {
+    ...defaultContentTypeMap,
+    "application/json": {
+      extensions: ["json", "json2"],
+    },
+  },
+})
+```
+
+Most often you will populate `method` and `headers` with a request like this:
+
+```js
+import { serveFile, startServer } from "@dmail/server"
+
+startServer({
+  requestToResponse: ({ ressource, methods, headers }) =>
+    serveFile(`${__dirname}${ressource}`, {
+      method,
+      headers,
+    }),
+})
+```
+
+### method
+
+When method is not `HEAD` or `GET` the returned response correspond to `501 not implemented`.
+
+### headers
+
+Two header will be checked in this optionnal object: `if-modified-since` and `if-none-match`.
+
+### cacheStrategy
+
+When `"mtime"`: response will contain `"last-modified"` header<br />
+When `"etag"`: response will contain `"etag"` header<br />
+When `"none"`: response will contain `"cache-control": "no-store"` header<br />
+
+Default value: `"mtime"`.
+
+### contentTypeMap
+
+There is a defaultContentTypeMap for well known mapping between file extension and content type header.<br />
+You can use this option to override it.
