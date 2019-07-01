@@ -22,7 +22,7 @@ export {
   convertFileSystemErrorToResponseProperties,
 } from "./src/file-service/index.js"
 
-export { ressourceToContentType } from "./src/ressource/index.js"
+export { ressourceToPathname, ressourceToContentType } from "./src/ressource/index.js"
 
 export { requestToAccessControlHeaders } from "./src/request/index.js"
 export { acceptsContentType } from "./src/headers/index.js"
