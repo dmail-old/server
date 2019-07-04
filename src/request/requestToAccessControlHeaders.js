@@ -1,6 +1,8 @@
+// https://www.w3.org/TR/cors/
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+
 import { URL } from "url"
 
-// https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 export const requestToAccessControlHeaders = (
   { headers },
   {
@@ -10,29 +12,39 @@ export const requestToAccessControlHeaders = (
     maxAge = 600,
   } = {},
 ) => {
-  let vary
+  const vary = []
   let allowedOrigins
   if ("origin" in headers && headers.origin !== "null") {
     allowedOrigins = [headers.origin]
-    vary = ["origin"]
+    vary.push("origin")
   } else if ("referer" in headers) {
     allowedOrigins = [hrefToOrigin(headers.referer)]
-    vary = ["referer"]
+    vary.push("referer")
   } else {
     allowedOrigins = ["*"]
   }
 
-  const allowedMethods = arrayWithoutDuplicate([
-    ...["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    ...("access-control-request-method" in headers ? headers["access-control-request-method"] : []),
-  ])
+  const allowedMethods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+  if ("access-control-request-method" in headers) {
+    headers["access-control-request-method"].split(", ").forEach((methodName) => {
+      if (!allowedMethods.includes(methodName)) {
+        allowedMethods.push(methodName)
+      }
+    })
+    vary.push("access-control-request-method")
+  }
 
-  const allowedHeaders = arrayWithoutDuplicate([
-    ...["x-requested-with", "content-type", "accept"],
-    ...("access-control-request-headers" in headers
-      ? headers["access-control-request-headers"].split(", ")
-      : []),
-  ])
+  const allowedHeaders = ["x-requested-with", "content-type", "accept"]
+
+  if ("access-control-request-headers" in headers) {
+    headers["access-control-request-headers"].split(", ").forEach((headerName) => {
+      const headerNameLowerCase = headerName.toLowerCase()
+      if (!allowedMethods.includes(headerNameLowerCase)) {
+        allowedMethods.push(headerNameLowerCase)
+      }
+    })
+    vary.push("access-control-request-headers")
+  }
 
   return {
     "access-control-allow-origin": allowedOrigins.join(", "),
@@ -40,11 +52,8 @@ export const requestToAccessControlHeaders = (
     "access-control-allow-headers": allowedHeaders.join(", "),
     "access-control-allow-credentials": allowCredentials,
     "access-control-max-age": maxAge,
-    ...(vary ? { vary: vary.join(",") } : {}),
+    ...(vary.length ? { vary: vary.join(", ") } : {}),
   }
 }
 
 const hrefToOrigin = (href) => new URL(href).origin
-
-const arrayWithoutDuplicate = (array) =>
-  array.filter((value, index) => array.indexOf(value) === index)
