@@ -17,27 +17,27 @@ export const createSelfSignature = () => {
   const attrs = [
     {
       name: "commonName",
-      value: "example.org",
+      value: "https://github.com/jsenv/jsenv-server",
     },
     {
       name: "countryName",
-      value: "US",
+      value: "FR",
     },
     {
       shortName: "ST",
-      value: "Virginia",
+      value: "Alpes Maritimes",
     },
     {
       name: "localityName",
-      value: "Blacksburg",
+      value: "Valbonne",
     },
     {
       name: "organizationName",
-      value: "Test",
+      value: "jsenv",
     },
     {
       shortName: "OU",
-      value: "Test",
+      value: "dmaillard06@gmail.com",
     },
   ]
   cert.setSubject(attrs)

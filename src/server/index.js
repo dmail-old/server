@@ -1,6 +1,7 @@
 export { startServer } from "./start-server.js"
 export { findFreePort } from "./findFreePort.js"
 export { firstService } from "./service-composition.js"
+export { createSelfSignature } from "./createSelfSignature.js"
 
 export {
   LOG_LEVEL_OFF,

@@ -2,6 +2,7 @@ export {
   findFreePort,
   startServer,
   firstService,
+  createSelfSignature,
   LOG_LEVEL_OFF,
   LOG_LEVEL_ERRORS,
   LOG_LEVEL_ERRORS_AND_WARNINGS,

@@ -18,6 +18,7 @@ import { populateNodeResponse, composeResponse } from "../response/index.js"
 import { colorizeResponseStatus } from "./colorizeResponseStatus.js"
 import { originAsString } from "./originAsString.js"
 import { listen, stopListening } from "./listen.js"
+import { createSelfSignature } from "./createSelfSignature.js"
 import { createLogger, LOG_LEVEL_ERRORS_WARNINGS_AND_LOGS } from "./logger.js"
 import {
   STOP_REASON_INTERNAL_ERROR,
@@ -279,7 +280,7 @@ callback: ${callback}`)
 
 const statusToStatusText = (status) => STATUS_CODES[status] || "not specified"
 
-const getNodeServerAndAgent = ({ protocol, signature = {} }) => {
+const getNodeServerAndAgent = ({ protocol, signature = createSelfSignature() }) => {
   if (protocol === "http") {
     return {
       nodeServer: createNodeServer(),
