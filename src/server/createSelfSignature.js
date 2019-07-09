@@ -1,20 +1,19 @@
 // https://github.com/digitalbazaar/forge/blob/master/examples/create-cert.js
+// https://github.com/digitalbazaar/forge/issues/660#issuecomment-467145103
 
 const forge = import.meta.require("node-forge")
 
 export const createSelfSignature = () => {
-  const { pki } = forge
+  const { pki, sha256 } = forge
 
+  const certificate = pki.createCertificate()
   const { privateKey, publicKey } = pki.rsa.generateKeyPair(1024)
-
-  const cert = pki.createCertificate()
-  cert.publicKey = publicKey
-  cert.serialNumber = "01"
-  cert.validity.notBefore = new Date()
-  cert.validity.notAfter = new Date()
-  cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 1)
-
-  const attrs = [
+  certificate.publicKey = publicKey
+  certificate.serialNumber = "01"
+  certificate.validity.notBefore = new Date()
+  certificate.validity.notAfter = new Date()
+  certificate.validity.notAfter.setFullYear(certificate.validity.notBefore.getFullYear() + 1)
+  const certificateAttributes = [
     {
       name: "commonName",
       value: "https://github.com/jsenv/jsenv-server",
@@ -37,67 +36,49 @@ export const createSelfSignature = () => {
     },
     {
       shortName: "OU",
-      value: "dmaillard06@gmail.com",
+      value: "jsenv server",
     },
   ]
-  cert.setSubject(attrs)
-  cert.setIssuer(attrs)
-  cert.setExtensions([
+  certificate.setSubject(certificateAttributes)
+  certificate.setIssuer(certificateAttributes)
+  const certificateExtensions = [
     {
       name: "basicConstraints",
-      cA: true,
+      critical: true,
+      cA: false,
     },
     {
       name: "keyUsage",
-      keyCertSign: true,
+      critical: true,
       digitalSignature: true,
-      nonRepudiation: true,
       keyEncipherment: true,
-      dataEncipherment: true,
     },
     {
       name: "extKeyUsage",
       serverAuth: true,
-      clientAuth: true,
-      codeSigning: true,
-      emailProtection: true,
-      timeStamping: true,
     },
     {
-      name: "nsCertType",
-      client: true,
-      server: true,
-      email: true,
-      objsign: true,
-      sslCA: true,
-      emailCA: true,
-      objCA: true,
+      name: "authorityKeyIdentifier",
+      keyIdentifier: certificate.generateSubjectKeyIdentifier().getBytes(),
     },
     {
       name: "subjectAltName",
       altNames: [
-        {
-          type: 6, // URI
-          value: "http://example.org/webid#me",
-        },
         {
           type: 7, // IP
           ip: "127.0.0.1",
         },
       ],
     },
-    {
-      name: "subjectKeyIdentifier",
-    },
-  ])
-  // FIXME: add authorityKeyIdentifier extension
+  ]
+  certificate.setExtensions(certificateExtensions)
 
   // self-sign certificate
-  cert.sign(privateKey /* , forge.md.sha256.create()*/)
+  certificate.sign(privateKey, sha256.create())
 
   return {
-    privateKey: pki.privateKeyToPem(privateKey),
-    publicKey: pki.publicKeyToPem(publicKey),
-    certificate: pki.certificateToPem(cert),
+    publicKeyPem: pki.publicKeyToPem(publicKey),
+    privateKeyPem: pki.privateKeyToPem(privateKey),
+    certificatePem: pki.certificateToPem(certificate),
   }
 }

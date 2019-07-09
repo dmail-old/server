@@ -3,8 +3,8 @@ import { createSelfSignature } from "../../index.js"
 
 const actual = createSelfSignature()
 const expected = {
-  privateKey: actual.privateKey,
-  publicKey: actual.publicKey,
-  certificate: actual.certificate,
+  publicKeyPem: actual.publicKeyPem,
+  privateKeyPem: actual.privateKeyPem,
+  certificatePem: actual.certificatePem,
 }
 assert({ actual, expected })
