@@ -18,7 +18,6 @@ import { populateNodeResponse, composeResponse } from "../response/index.js"
 import { colorizeResponseStatus } from "./colorizeResponseStatus.js"
 import { originAsString } from "./originAsString.js"
 import { listen, stopListening } from "./listen.js"
-import { createSelfSignature } from "./createSelfSignature.js"
 import { createLogger, LOG_LEVEL_ERRORS_WARNINGS_AND_LOGS } from "./logger.js"
 import {
   STOP_REASON_INTERNAL_ERROR,
@@ -29,6 +28,7 @@ import {
   STOP_REASON_PROCESS_EXIT,
   STOP_REASON_NOT_SPECIFIED,
 } from "./stop-reasons.js"
+import * as defaultSignature from "./signature.js"
 
 const killPort = import.meta.require("kill-port")
 
@@ -43,7 +43,7 @@ export const startServer = async ({
   port = 0, // aasign a random available port
   forcePort = false,
   // when port is https you must provide { privateKey, certificate } under signature
-  signature,
+  signature = defaultSignature,
   stopOnSIGINT = true,
   // auto close the server when the process exits
   stopOnExit = true,
@@ -280,7 +280,7 @@ callback: ${callback}`)
 
 const statusToStatusText = (status) => STATUS_CODES[status] || "not specified"
 
-const getNodeServerAndAgent = ({ protocol, signature = createSelfSignature() }) => {
+const getNodeServerAndAgent = ({ protocol, signature }) => {
   if (protocol === "http") {
     return {
       nodeServer: createNodeServer(),
@@ -289,15 +289,15 @@ const getNodeServerAndAgent = ({ protocol, signature = createSelfSignature() }) 
   }
 
   if (protocol === "https") {
-    const { privateKeyPem, certificatePem } = signature
-    if (!privateKeyPem || !certificatePem) {
+    const { privateKey, certificate } = signature
+    if (!privateKey || !certificate) {
       throw new Error(`missing signature for https server`)
     }
 
     return {
       nodeServer: createNodeSecureServer({
-        key: privateKeyPem,
-        cert: certificatePem,
+        key: privateKey,
+        cert: certificate,
       }),
       agent: new SecureAgent({
         rejectUnauthorized: false, // allow self signed certificate
