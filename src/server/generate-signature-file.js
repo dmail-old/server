@@ -21,7 +21,8 @@ fileWrite(
 
 export const publicKey = ${pemToJavaScriptValue(publicKeyPem)}
 
-export const certificate = ${pemToJavaScriptValue(certificatePem)}`,
+export const certificate = ${pemToJavaScriptValue(certificatePem)}
+`,
 ).then(() => {
   console.log(`-> ${signaturePath}`)
 })
