@@ -60,7 +60,6 @@ export const createServerSentEventsRoom = ({
 
         const connection = {
           write: next,
-          unsubscribe,
         }
 
         const unsubscribe = () => {
@@ -72,7 +71,9 @@ export const createServerSentEventsRoom = ({
           )
         }
 
+        connection.unsubscribe = unsubscribe
         connections.add(connection)
+
         return {
           unsubscribe,
         }
