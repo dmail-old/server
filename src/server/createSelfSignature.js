@@ -9,10 +9,9 @@ export const createSelfSignature = () => {
   const certificate = pki.createCertificate()
   const { privateKey, publicKey } = pki.rsa.generateKeyPair(1024)
   certificate.publicKey = publicKey
-  certificate.serialNumber = "01"
-  certificate.validity.notBefore = new Date()
-  certificate.validity.notAfter = new Date()
-  certificate.validity.notAfter.setFullYear(certificate.validity.notBefore.getFullYear() + 1)
+  certificate.serialNumber = randomSerialNumber()
+  certificate.validity.notBefore = generateNotValideBeforeDate()
+  certificate.validity.notAfter = generateNotValidAfterDate()
   const certificateAttributes = [
     {
       name: "commonName",
@@ -81,4 +80,29 @@ export const createSelfSignature = () => {
     privateKeyPem: pki.privateKeyToPem(privateKey),
     certificatePem: pki.certificateToPem(certificate),
   }
+}
+
+const generateNotValideBeforeDate = () => {
+  const date = new Date(Date.now() - 1000)
+  return date
+}
+
+const generateNotValidAfterDate = () => {
+  const date = new Date()
+  date.setFullYear(date.getFullYear() + 9)
+  return date
+}
+
+const toPositiveHex = (hexString) => {
+  var mostSiginficativeHexAsInt = parseInt(hexString[0], 16)
+  if (mostSiginficativeHexAsInt < 8) {
+    return hexString
+  }
+
+  mostSiginficativeHexAsInt -= 8
+  return mostSiginficativeHexAsInt.toString() + hexString.substring(1)
+}
+
+const randomSerialNumber = () => {
+  return toPositiveHex(forge.util.bytesToHex(forge.random.getBytesSync(16)))
 }

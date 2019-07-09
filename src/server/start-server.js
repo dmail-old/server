@@ -289,15 +289,15 @@ const getNodeServerAndAgent = ({ protocol, signature = createSelfSignature() }) 
   }
 
   if (protocol === "https") {
-    const { privateKey, certificate } = signature
-    if (!privateKey || !certificate) {
+    const { privateKeyPem, certificatePem } = signature
+    if (!privateKeyPem || !certificatePem) {
       throw new Error(`missing signature for https server`)
     }
 
     return {
       nodeServer: createNodeSecureServer({
-        key: privateKey,
-        cert: certificate,
+        key: privateKeyPem,
+        cert: certificatePem,
       }),
       agent: new SecureAgent({
         rejectUnauthorized: false, // allow self signed certificate
