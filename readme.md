@@ -94,5 +94,5 @@ If you want to know more about `firstService`, there is a dedicated page documen
 ## Installation
 
 ```console
-npm install @dmail/server@1.10.0
+npm install @dmail/server@1.11.0
 ```

@@ -21,7 +21,7 @@ If you don't pass `protocol` option, its value will be:
 ### `https` protocol certificate
 
 If you use `https` protocol a default self signed certificate will be used.<br />
-It can be found inside [/server/signature.js](../src/server/signature.js).<br />
+It can be found inside [/server/signature.js](https://github.com/dmail/server/blob/4d40f790adebaa14b7482a9fb228e0c1f63e94b7/src/server/signature.js#L24).<br />
 You may want to add this certificate to your system/browser trusted certificates.
 
 You can also pass your own certificate.<br />
