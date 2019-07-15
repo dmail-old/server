@@ -13,7 +13,8 @@ import {
   registerUngaranteedProcessTeardown,
 } from "@dmail/process-signals"
 import { trackConnections, trackClients, trackRequestHandlers } from "../trackers/index.js"
-import { requestToAccessControlHeaders, nodeRequestToRequest } from "../request/index.js"
+import { nodeRequestToRequest } from "../request/index.js"
+import { generateAccessControlHeaders } from "../cors/generateAccessControlHeaders.js"
 import { populateNodeResponse, composeResponse } from "../response/index.js"
 import { colorizeResponseStatus } from "./colorizeResponseStatus.js"
 import { originAsString } from "./originAsString.js"
@@ -54,6 +55,14 @@ export const startServer = async ({
   keepProcessAlive = true,
   requestToResponse = () => null,
   cors = false,
+  accessControlAllowedOrigins,
+  accessControlAllowRequestOrigin,
+  accessControlAllowedMethods,
+  accessControlAllowRequestMethod,
+  accessControlAllowedHeaders,
+  accessControlAllowRequestHeaders,
+  accessControlAllowCredentials,
+  accessControlMaxAge,
   logLevel = LOG_LEVEL_ERRORS_WARNINGS_AND_LOGS,
   startedCallback = () => {},
   stoppedCallback = () => {},
@@ -184,14 +193,24 @@ export const startServer = async ({
   if (cors) {
     const originalRequestToResponse = requestToResponse
     requestToResponse = async (request) => {
-      const accessControlHeaders = requestToAccessControlHeaders(request)
+      const accessControlHeaders = generateAccessControlHeaders({
+        request,
+        accessControlAllowedOrigins,
+        accessControlAllowRequestOrigin,
+        accessControlAllowedMethods,
+        accessControlAllowRequestMethod,
+        accessControlAllowedHeaders,
+        accessControlAllowRequestHeaders,
+        accessControlAllowCredentials,
+        accessControlMaxAge,
+      })
 
       if (request.method === "OPTIONS") {
         return {
           status: 200,
           headers: {
-            ...accessControlHeaders,
             "content-length": 0,
+            ...accessControlHeaders,
           },
         }
       }
