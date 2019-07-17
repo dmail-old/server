@@ -25,7 +25,11 @@ export {
   convertFileSystemErrorToResponseProperties,
 } from "./src/file-service/index.js"
 
-export { ressourceToPathname, ressourceToContentType } from "./src/ressource/index.js"
+export {
+  ressourceToSearchParamValue,
+  ressourceToPathname,
+  ressourceToContentType,
+} from "./src/ressource/index.js"
 
 export {
   defaultAccessControlAllowedOrigins,

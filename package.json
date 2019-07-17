@@ -1,6 +1,6 @@
 {
 	"name": "@dmail/server",
-	"version": "1.11.0",
+	"version": "1.12.0",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -17,19 +17,19 @@
 		"/dist/"
 	],
 	"dependencies": {
+		"@jsenv/operating-system-path": "2.1.0",
+		"@jsenv/module-resolution": "3.1.0",
 		"@dmail/cancellation": "2.1.0",
 		"@dmail/process-signals": "1.0.0",
 		"@dmail/helper": "2.2.0",
-		"@jsenv/operating-system-path": "2.1.0",
-		"@jsenv/module-resolution": "3.0.0",
 		"kill-port": "1.3.2",
 		"node-forge": "0.7.1"
 	},
 	"devDependencies": {
-		"@jsenv/core": "5.100.0",
-		"@jsenv/testing": "1.4.0",
-		"@jsenv/node-launcher": "1.6.0",
-		"@jsenv/bundling": "1.5.0",
+		"@jsenv/core": "5.108.0",
+		"@jsenv/testing": "1.12.0",
+		"@jsenv/node-launcher": "1.11.0",
+		"@jsenv/bundling": "1.10.0",
 		"@jsenv/node-module-import-map": "2.1.0",
 		"@jsenv/eslint-config": "8.0.0",
 		"@jsenv/prettier-config": "1.0.0",
