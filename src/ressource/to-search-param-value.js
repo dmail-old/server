@@ -1,3 +1,4 @@
+import { URLSearchParams } from "url"
 import { ressourceToSearch } from "./to-search.js"
 
 export const ressourceToSearchParamValue = (ressource, searchParamName) => {
