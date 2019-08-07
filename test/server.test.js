@@ -15,6 +15,7 @@ process.on("SIGINT", () => cancel("process interrupt"))
 const { origin, agent, stop } = await startServer({
   cancellationToken: token,
   protocol: "http",
+  ip: "",
   port: 8998,
   logLevel: "off",
   requestToResponse: () => {
