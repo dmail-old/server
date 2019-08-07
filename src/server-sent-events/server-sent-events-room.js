@@ -65,9 +65,7 @@ export const createServerSentEventsRoom = ({
         const unsubscribe = () => {
           connections.delete(connection)
           log(
-            `connection closed by us, number of client connected to event source: ${
-              connections.size
-            }`,
+            `connection closed by us, number of client connected to event source: ${connections.size}`,
           )
         }
 
@@ -81,9 +79,7 @@ export const createServerSentEventsRoom = ({
     })
 
     log(
-      `client joined, number of client connected to event source: ${
-        connections.size
-      }, max allowed: ${maxConnectionAllowed}`,
+      `client joined, number of client connected to event source: ${connections.size}, max allowed: ${maxConnectionAllowed}`,
     )
 
     return {
