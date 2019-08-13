@@ -19,10 +19,12 @@ const headerCompositionMapping = {
   vary: composeHeaderValues,
 }
 
+export const composeResponseHeaders = compositionMappingToCompose(headerCompositionMapping)
+
 const responseCompositionMapping = {
   status: (prevStatus, status) => status,
   statusText: (prevStatusText, statusText) => statusText,
-  headers: compositionMappingToCompose(headerCompositionMapping),
+  headers: composeResponseHeaders,
   body: (prevBody, body) => body,
 }
 

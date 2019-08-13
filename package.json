@@ -1,6 +1,6 @@
 {
 	"name": "@dmail/server",
-	"version": "1.15.0",
+	"version": "2.0.0",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -43,13 +43,13 @@
 	},
 	"devDependencies": {
 		"@jsenv/core": "5.126.0",
-		"@jsenv/testing": "1.21.0",
+		"@jsenv/testing": "1.22.0",
 		"@jsenv/node-launcher": "1.14.0",
 		"@jsenv/bundling": "1.13.0",
 		"@jsenv/node-module-import-map": "3.0.0",
 		"@jsenv/eslint-config": "9.7.0",
 		"@jsenv/prettier-config": "1.0.0",
-		"@jsenv/prettier-check-project": "3.1.0",
+		"@jsenv/prettier-check-project": "3.2.0",
 		"@jsenv/codecov-upload": "1.6.0",
 		"@dmail/assert": "3.12.0",
 		"node-fetch": "2.3.0",

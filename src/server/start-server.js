@@ -15,7 +15,7 @@ import {
 import { trackConnections, trackClients, trackRequestHandlers } from "../trackers/index.js"
 import { nodeRequestToRequest } from "../request/index.js"
 import { generateAccessControlHeaders } from "../cors/generateAccessControlHeaders.js"
-import { populateNodeResponse, composeResponse } from "../response/index.js"
+import { populateNodeResponse, composeResponseHeaders, composeResponse } from "../response/index.js"
 import { colorizeResponseStatus } from "./colorizeResponseStatus.js"
 import { originAsString } from "./originAsString.js"
 import { listen, stopListening } from "./listen.js"
@@ -35,8 +35,6 @@ const killPort = import.meta.require("kill-port")
 
 const STATUS_TEXT_INTERNAL_ERROR = "internal error"
 
-// todo: provide an option like debugInternalError
-// which sends error.stack on 500 to the client
 export const startServer = async ({
   cancellationToken = createCancellationToken(),
   protocol = "http",
@@ -64,6 +62,23 @@ export const startServer = async ({
   accessControlAllowCredentials,
   accessControlMaxAge,
   logLevel = LOG_LEVEL_ERRORS_WARNINGS_AND_LOGS,
+  sendInternalErrorStack = false,
+  internalErrorToResponseProperties = (error) => {
+    const body = error
+      ? JSON.stringify({
+          code: error.code || "UNKNOWN_ERROR",
+          ...(sendInternalErrorStack ? { stack: error.stack } : {}),
+        })
+      : JSON.stringify({ code: "VALUE_THROWED", value: error })
+
+    return {
+      headers: {
+        "content-type": "application/json",
+        "content-length": Buffer.byteLength(body),
+      },
+      body,
+    }
+  },
   startedCallback = () => {},
   stoppedCallback = () => {},
 } = {}) => {
@@ -190,84 +205,113 @@ export const startServer = async ({
   //   console.log("socket", { connecting: socket.connecting, destroyed: socket.destroyed })
   // })
 
-  if (cors) {
-    const originalRequestToResponse = requestToResponse
-    requestToResponse = async (request) => {
-      const accessControlHeaders = generateAccessControlHeaders({
-        request,
-        accessControlAllowedOrigins,
-        accessControlAllowRequestOrigin,
-        accessControlAllowedMethods,
-        accessControlAllowRequestMethod,
-        accessControlAllowedHeaders,
-        accessControlAllowRequestHeaders,
-        accessControlAllowCredentials,
-        accessControlMaxAge,
-      })
-
-      if (request.method === "OPTIONS") {
-        return {
-          status: 200,
-          headers: {
-            "content-length": 0,
-            ...accessControlHeaders,
-          },
-        }
-      }
-
-      const response = await originalRequestToResponse(request)
-      return composeResponse({ headers: accessControlHeaders }, response)
-    }
-  }
-
   requestHandlerTracker.add(async (nodeRequest, nodeResponse) => {
+    const { request, response, error } = await generateResponseDescription({
+      nodeRequest,
+      origin,
+    })
+
+    if (
+      request.method !== "HEAD" &&
+      response.headers["content-length"] > 0 &&
+      response.body === ""
+    ) {
+      logError(
+        createContentLengthMismatchError(
+          `content-length header is ${response.headers["content-length"]} but body is empty`,
+        ),
+      )
+    }
+
+    log(`${request.method} ${request.origin}${request.ressource}`)
+    if (error) {
+      logError(error)
+    }
+    log(`${colorizeResponseStatus(response.status)} ${response.statusText}`)
+    populateNodeResponse(nodeResponse, response, {
+      ignoreBody: request.method === "HEAD",
+    })
+  })
+
+  const generateResponseDescription = async ({ nodeRequest, origin }) => {
     const request = nodeRequestToRequest(nodeRequest, origin)
 
     nodeRequest.on("error", (error) => {
       logError("error on", request.ressource, error)
     })
 
-    let response
-    try {
-      const generatedResponse = await requestToResponse(request)
-      const { status = 501, statusText = statusToStatusText(status), headers = {}, body = "" } =
-        generatedResponse || {}
-      response = Object.freeze({ status, statusText, headers, body })
+    const responsePropertiesToResponse = ({
+      status = 501,
+      statusText = statusToStatusText(status),
+      headers = {},
+      body = "",
+    }) => {
+      if (cors) {
+        const accessControlHeaders = generateAccessControlHeaders({
+          request,
+          accessControlAllowedOrigins,
+          accessControlAllowRequestOrigin,
+          accessControlAllowedMethods,
+          accessControlAllowRequestMethod,
+          accessControlAllowedHeaders,
+          accessControlAllowRequestHeaders,
+          accessControlAllowCredentials,
+          accessControlMaxAge,
+        })
 
-      if (
-        request.method !== "HEAD" &&
-        response.headers["content-length"] > 0 &&
-        response.body === ""
-      ) {
-        throw createContentLengthMismatchError(
-          `content-length header is ${response.headers["content-length"]} but body is empty`,
-        )
+        return {
+          status,
+          statusText,
+          headers: composeResponseHeaders(headers, accessControlHeaders),
+          body,
+        }
+      }
+
+      return {
+        status,
+        statusText,
+        headers,
+        body,
+      }
+    }
+
+    try {
+      if (cors && request.method === "OPTIONS") {
+        return {
+          request,
+          response: responsePropertiesToResponse({
+            status: 200,
+            headers: {
+              "content-length": 0,
+            },
+          }),
+        }
+      }
+
+      const responseProperties = await requestToResponse(request)
+      return {
+        request,
+        response: responsePropertiesToResponse(responseProperties),
       }
     } catch (error) {
-      const body = error && error.stack ? error.stack : error
-
-      response = Object.freeze({
-        status: 500,
-        statusText: STATUS_TEXT_INTERNAL_ERROR,
-        headers: {
-          // ensure error are not cached
-          "cache-control": "no-store",
-          "content-type": "text/plain",
-          "content-length": Buffer.byteLength(body),
-        },
-        body,
-      })
+      return {
+        request,
+        response: composeResponse(
+          responsePropertiesToResponse({
+            status: 500,
+            statusText: STATUS_TEXT_INTERNAL_ERROR,
+            headers: {
+              // ensure error are not cached
+              "cache-control": "no-store",
+              "content-type": "text/plain",
+            },
+          }),
+          internalErrorToResponseProperties(error),
+        ),
+        error,
+      }
     }
-
-    log(`${request.method} ${request.origin}${request.ressource}`)
-    log(`${colorizeResponseStatus(response.status)} ${response.statusText}`)
-    if (response.status === 500) {
-      log(response.body)
-    }
-    populateNodeResponse(nodeResponse, response, {
-      ignoreBody: request.method === "HEAD",
-    })
-  })
+  }
 
   return {
     getStatus: () => status,
