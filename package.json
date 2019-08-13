@@ -1,6 +1,6 @@
 {
 	"name": "@dmail/server",
-	"version": "1.14.0",
+	"version": "1.15.0",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -12,7 +12,6 @@
 	"main": "dist/commonjs/main.js",
 	"module": "index.js",
 	"files": [
-		"/script/postinstall/",
 		"/dist/",
 		"/src/",
 		"/index.js"
@@ -29,8 +28,9 @@
 		"dist": "npm run clean && npm run generate-commonjs-bundle",
 		"clean": "rimraf dist && rimraf coverage",
 		"reinstall": "npm run clean && rimraf node_modules && npm install",
-		"postinstall": "node ./script/postinstall/postinstall.js",
-		"prepublishOnly": "npm run dist"
+		"postinstall": "npm run generate-import-map",
+		"prepublishOnly": "node ./script/transform-package/remove-postinstall.js && npm run dist",
+		"postpublish": "node ./script/transform-package/restore-postinstall.js"
 	},
 	"dependencies": {
 		"@jsenv/operating-system-path": "2.2.0",
