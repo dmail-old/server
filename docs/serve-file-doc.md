@@ -49,7 +49,7 @@ When `"mtime"`: response will contain `"last-modified"` header<br />
 When `"etag"`: response will contain `"etag"` header<br />
 When `"none"`: response will contain `"cache-control": "no-store"` header<br />
 
-Default value: `"mtime"`.
+Default value: `"etag"`.
 
 ### contentTypeMap
 

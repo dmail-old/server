@@ -1,8 +1,8 @@
 /node_modules
 /package.json
 /package-lock.json
+/importMap.json
 /coverage
-dist
-.dist
-syntax-error.js
+/dist
+/.dist
 
