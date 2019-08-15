@@ -56,6 +56,8 @@ If you don't pass `ip` option, its value will be:
 "127.0.0.1"
 ```
 
+You can pass an empty string to listen any ip.
+
 ## port
 
 ```js

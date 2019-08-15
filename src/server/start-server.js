@@ -174,14 +174,14 @@ export const startServer = async ({
   }
 
   if (stopOnExit) {
-    const unregister = registerUngaranteedProcessTeardown((reason) => {
+    const unregister = registerUngaranteedProcessTeardown((tearDownReason) => {
       stop(
         {
           beforeExit: STOP_REASON_PROCESS_BEFORE_EXIT,
           hangupOrDeath: STOP_REASON_PROCESS_HANGUP_OR_DEATH,
           death: STOP_REASON_PROCESS_DEATH,
           exit: STOP_REASON_PROCESS_EXIT,
-        }[reason],
+        }[tearDownReason],
       )
     })
     registerCleanupCallback(unregister)
