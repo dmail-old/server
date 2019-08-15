@@ -1,13 +1,17 @@
 import { createReadStream } from "fs"
 import { folderRead, fileStat, fileRead } from "@dmail/helper"
-import { pathnameToOperatingSystemPath } from "@jsenv/operating-system-path"
-import { ressourceToPathname, ressourceToContentType } from "../ressource/index.js"
+import {
+  operatingSystemPathToPathname,
+  pathnameToOperatingSystemPath,
+} from "@jsenv/operating-system-path"
+import { hrefToPathname } from "@jsenv/module-resolution"
+import { ressourceToContentType } from "../ressource/index.js"
 import { contentTypeMap as defaultContentTypeMap } from "./content-type-map.js"
 import { createETag } from "./etag.js"
 import { convertFileSystemErrorToResponseProperties } from "./convertFileSystemErrorToResponseProperties.js"
 
 export const serveFile = async (
-  ressource,
+  path,
   {
     method = "GET",
     headers = {},
@@ -22,14 +26,16 @@ export const serveFile = async (
     }
   }
 
+  const href = `file://${operatingSystemPathToPathname(path)}`
+  const pathname = hrefToPathname(href)
+  const filesystemPath = pathnameToOperatingSystemPath(pathname)
+
   try {
     const cacheWithMtime = cacheStrategy === "mtime"
     const cacheWithETag = cacheStrategy === "etag"
     const cachedDisabled = cacheStrategy === "none"
-    const pathname = ressourceToPathname(ressource)
-    const filename = pathnameToOperatingSystemPath(pathname)
 
-    const stat = await fileStat(filename)
+    const stat = await fileStat(filesystemPath)
 
     if (stat.isDirectory()) {
       if (canReadDirectory === false) {
@@ -42,7 +48,7 @@ export const serveFile = async (
         }
       }
 
-      const files = await folderRead(filename)
+      const files = await folderRead(filesystemPath)
       const filesAsJSON = JSON.stringify(files)
 
       return {
@@ -82,14 +88,14 @@ export const serveFile = async (
           ...(cachedDisabled ? { "cache-control": "no-store" } : {}),
           "last-modified": dateToUTCString(stat.mtime),
           "content-length": stat.size,
-          "content-type": ressourceToContentType(ressource, contentTypeMap),
+          "content-type": ressourceToContentType(filesystemPath, contentTypeMap),
         },
-        body: createReadStream(filename),
+        body: createReadStream(filesystemPath),
       }
     }
 
     if (cacheWithETag) {
-      const content = await fileRead(filename)
+      const content = await fileRead(filesystemPath)
       const eTag = createETag(content)
 
       if ("if-none-match" in headers && headers["if-none-match"] === eTag) {
@@ -106,7 +112,7 @@ export const serveFile = async (
         headers: {
           ...(cachedDisabled ? { "cache-control": "no-store" } : {}),
           "content-length": stat.size,
-          "content-type": ressourceToContentType(ressource, contentTypeMap),
+          "content-type": ressourceToContentType(filesystemPath, contentTypeMap),
           etag: eTag,
         },
         body: content,
@@ -118,9 +124,9 @@ export const serveFile = async (
       headers: {
         "cache-control": "no-store",
         "content-length": stat.size,
-        "content-type": ressourceToContentType(ressource, contentTypeMap),
+        "content-type": ressourceToContentType(filesystemPath, contentTypeMap),
       },
-      body: createReadStream(filename),
+      body: createReadStream(filesystemPath),
     }
   } catch (e) {
     return convertFileSystemErrorToResponseProperties(e)

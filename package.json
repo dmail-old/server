@@ -34,7 +34,7 @@
 	},
 	"dependencies": {
 		"@jsenv/operating-system-path": "2.2.0",
-		"@jsenv/module-resolution": "3.2.0",
+		"@jsenv/module-resolution": "3.3.0",
 		"@dmail/cancellation": "2.5.0",
 		"@dmail/process-signals": "1.0.0",
 		"@dmail/helper": "2.2.0",

@@ -8,29 +8,29 @@
       "@jsenv/operating-system-path": [
         "./node_modules/@jsenv/operating-system-path/index.js"
       ],
-      "@jsenv/module-resolution": [
-        "./node_modules/@jsenv/module-resolution/index.js"
-      ],
       "@dmail/cancellation": [
         "./node_modules/@dmail/cancellation/index.js"
-      ],
-      "@dmail/helper": [
-        "./node_modules/@dmail/helper/index.js"
       ],
       "@dmail/process-signals": [
         "./node_modules/@dmail/process-signals/index.js"
       ],
+      "@dmail/helper": [
+        "./node_modules/@dmail/helper/index.js"
+      ],
       "kill-port": [
         "./node_modules/kill-port/index.js"
+      ],
+      "node-forge": [
+        "./node_modules/node-forge/lib/index.js"
       ],
       "@jsenv/core": [
         "./node_modules/@jsenv/core/index.js"
       ],
-      "@jsenv/node-launcher": [
-        "./node_modules/@jsenv/node-launcher/index.js"
-      ],
       "@jsenv/testing": [
         "./node_modules/@jsenv/testing/index.js"
+      ],
+      "@jsenv/node-launcher": [
+        "./node_modules/@jsenv/node-launcher/index.js"
       ],
       "@jsenv/bundling": [
         "./node_modules/@jsenv/bundling/index.js"
@@ -38,14 +38,14 @@
       "@jsenv/node-module-import-map": [
         "./node_modules/@jsenv/node-module-import-map/index.js"
       ],
-      "@jsenv/eslint-config": [
-        "./node_modules/@jsenv/eslint-config/index.js"
-      ],
-      "node-forge": [
-        "./node_modules/node-forge/lib/index.js"
+      "@jsenv/prettier-config": [
+        "./node_modules/@jsenv/prettier-config/index.js"
       ],
       "@jsenv/prettier-check-project": [
         "./node_modules/@jsenv/prettier-check-project/index.js"
+      ],
+      "@jsenv/eslint-config": [
+        "./node_modules/@jsenv/eslint-config/index.js"
       ],
       "@jsenv/codecov-upload": [
         "./node_modules/@jsenv/codecov-upload/index.js"
@@ -65,8 +65,8 @@
       "rimraf": [
         "./node_modules/rimraf/rimraf.js"
       ],
-      "@jsenv/prettier-config": [
-        "./node_modules/@jsenv/prettier-config/index.js"
+      "@jsenv/module-resolution": [
+        "./node_modules/@jsenv/module-resolution/index.js"
       ]
     }
   }

@@ -1,4 +1,8 @@
-export { startServer } from "./start-server.js"
+export {
+  startServer,
+  defaultAccessControlAllowedMethods,
+  defaultAccessControlAllowedHeaders,
+} from "./start-server.js"
 export { findFreePort } from "./findFreePort.js"
 export { firstService } from "./service-composition.js"
 export { privateKey, publicKey, certificate } from "./signature.js"

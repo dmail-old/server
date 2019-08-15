@@ -17,6 +17,8 @@ export {
   STOP_REASON_PROCESS_DEATH,
   STOP_REASON_PROCESS_EXIT,
   STOP_REASON_NOT_SPECIFIED,
+  defaultAccessControlAllowedMethods,
+  defaultAccessControlAllowedHeaders,
 } from "./src/server/index.js"
 
 export {
@@ -30,12 +32,6 @@ export {
   ressourceToPathname,
   ressourceToContentType,
 } from "./src/ressource/index.js"
-
-export {
-  defaultAccessControlAllowedOrigins,
-  defaultAccessControlAllowedMethods,
-  defaultAccessControlAllowedHeaders,
-} from "./src/cors/generateAccessControlHeaders.js"
 
 export { acceptsContentType } from "./src/headers/index.js"
 export { composeResponse } from "./src/response/index.js"

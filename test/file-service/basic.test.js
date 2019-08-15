@@ -1,15 +1,19 @@
-import fs from "fs"
-import { importMetaURLToFolderPath } from "@jsenv/operating-system-path"
+import { readFileSync } from "fs"
+import {
+  importMetaURLToFolderPath,
+  operatingSystemPathToPathname,
+} from "@jsenv/operating-system-path"
 import { assert } from "@dmail/assert"
 import { serveFile } from "../../index.js"
 
 const testFolderPath = importMetaURLToFolderPath(import.meta.url)
+const ressource = "/file.js?ok=true"
+const filePathname = `${operatingSystemPathToPathname(testFolderPath)}${ressource}`
 
-const ressource = "/file.js"
-const actual = await serveFile(`${testFolderPath}${ressource}`, {
+const actual = await serveFile(filePathname, {
   cacheStrategy: "etag",
 })
-const content = String(fs.readFileSync(`${testFolderPath}${ressource}`))
+const content = String(readFileSync(`${testFolderPath}/file.js`))
 const length = Buffer.byteLength(content)
 const expected = {
   status: 200,
