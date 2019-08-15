@@ -39,7 +39,7 @@ export const startServer = async ({
   cancellationToken = createCancellationToken(),
   protocol = "http",
   ip = "127.0.0.1",
-  port = 0, // aasign a random available port
+  port = 0, // assign a random available port
   forcePort = false,
   // when port is https you must provide { privateKey, certificate } under signature
   signature = defaultSignature,
@@ -47,7 +47,7 @@ export const startServer = async ({
   // auto close the server when the process exits
   stopOnExit = true,
   // auto close when server respond with a 500
-  stopOnError = true,
+  stopOnInternalError = false,
   // auto close the server when an uncaughtException happens
   stopOnCrash = false,
   keepProcessAlive = true,
@@ -157,7 +157,7 @@ export const startServer = async ({
     registerCleanupCallback(unregister)
   }
 
-  if (stopOnError) {
+  if (stopOnInternalError) {
     const unregister = requestHandlerTracker.add((nodeRequest, nodeResponse) => {
       if (
         nodeResponse.statusCode === 500 &&
