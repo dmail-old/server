@@ -12,9 +12,9 @@ import {
   registerUnadvisedProcessCrashCallback,
   registerUngaranteedProcessTeardown,
 } from "@dmail/process-signals"
+import { hrefToOrigin } from "@jsenv/module-resolution"
 import { trackConnections, trackClients, trackRequestHandlers } from "../trackers/index.js"
 import { nodeRequestToRequest } from "../request/index.js"
-import { generateAccessControlHeaders } from "../cors/generateAccessControlHeaders.js"
 import { populateNodeResponse, composeResponseHeaders, composeResponse } from "../response/index.js"
 import { colorizeResponseStatus } from "./colorizeResponseStatus.js"
 import { originAsString } from "./originAsString.js"
@@ -35,6 +35,9 @@ const killPort = import.meta.require("kill-port")
 
 const STATUS_TEXT_INTERNAL_ERROR = "internal error"
 
+export const defaultAccessControlAllowedMethods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+export const defaultAccessControlAllowedHeaders = ["x-requested-with"]
+
 export const startServer = async ({
   cancellationToken = createCancellationToken(),
   protocol = "http",
@@ -52,15 +55,16 @@ export const startServer = async ({
   stopOnCrash = false,
   keepProcessAlive = true,
   requestToResponse = () => null,
-  cors = false,
-  accessControlAllowedOrigins,
-  accessControlAllowRequestOrigin,
-  accessControlAllowedMethods,
-  accessControlAllowRequestMethod,
-  accessControlAllowedHeaders,
-  accessControlAllowRequestHeaders,
-  accessControlAllowCredentials,
-  accessControlMaxAge,
+  accessControlAllowedOrigins = [],
+  accessControlAllowRequestOrigin = false,
+  accessControlAllowedMethods = defaultAccessControlAllowedMethods,
+  accessControlAllowRequestMethod = false,
+  accessControlAllowedHeaders = defaultAccessControlAllowedHeaders,
+  accessControlAllowRequestHeaders = false,
+  accessControlAllowCredentials = false,
+  // by default OPTIONS request can be cache for a long time, it's not going to change soon ?
+  // we could put a lot here, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
+  accessControlMaxAge = 600,
   logLevel = LOG_LEVEL_ERRORS_WARNINGS_AND_LOGS,
   sendInternalErrorStack = false,
   internalErrorToResponseProperties = (error) => {
@@ -233,6 +237,9 @@ export const startServer = async ({
     })
   })
 
+  const corsEnabled = accessControlAllowRequestOrigin || accessControlAllowedOrigins.length
+  // here we check access control options to throw or warn if we find strange values
+
   const generateResponseDescription = async ({ nodeRequest, origin }) => {
     const request = nodeRequestToRequest(nodeRequest, origin)
 
@@ -246,7 +253,7 @@ export const startServer = async ({
       headers = {},
       body = "",
     }) => {
-      if (cors) {
+      if (corsEnabled) {
         const accessControlHeaders = generateAccessControlHeaders({
           request,
           accessControlAllowedOrigins,
@@ -276,7 +283,7 @@ export const startServer = async ({
     }
 
     try {
-      if (cors && request.method === "OPTIONS") {
+      if (corsEnabled && request.method === "OPTIONS") {
         return {
           request,
           response: responsePropertiesToResponse({
@@ -376,4 +383,67 @@ const createContentLengthMismatchError = (message) => {
   error.code = "CONTENT_LENGTH_MISMATCH"
   error.name = error.code
   return error
+}
+
+// https://www.w3.org/TR/cors/
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+const generateAccessControlHeaders = ({
+  request: { headers },
+  accessControlAllowedOrigins,
+  accessControlAllowRequestOrigin,
+  accessControlAllowedMethods,
+  accessControlAllowRequestMethod,
+  accessControlAllowedHeaders,
+  accessControlAllowRequestHeaders,
+  accessControlAllowCredentials,
+  // by default OPTIONS request can be cache for a long time, it's not going to change soon ?
+  // we could put a lot here, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
+  accessControlMaxAge = 600,
+} = {}) => {
+  const vary = []
+
+  const allowedOriginArray = [...accessControlAllowedOrigins]
+  if (accessControlAllowRequestOrigin) {
+    if ("origin" in headers && headers.origin !== "null") {
+      allowedOriginArray.push(headers.origin)
+      vary.push("origin")
+    } else if ("referer" in headers) {
+      allowedOriginArray.push(hrefToOrigin(headers.referer))
+      vary.push("referer")
+    } else {
+      allowedOriginArray.push("*")
+    }
+  }
+
+  const allowedMethodArray = [...accessControlAllowedMethods]
+  if (accessControlAllowRequestMethod && "access-control-request-method" in headers) {
+    const requestMethodName = headers["access-control-request-method"]
+    if (!allowedMethodArray.includes(requestMethodName)) {
+      allowedMethodArray.push(requestMethodName)
+      vary.push("access-control-request-method")
+    }
+  }
+
+  const allowedHeaderArray = [...accessControlAllowedHeaders]
+  if (accessControlAllowRequestHeaders && "access-control-request-headers" in headers) {
+    const requestHeaderNameArray = headers["access-control-request-headers"].split(", ")
+    requestHeaderNameArray.forEach((headerName) => {
+      const headerNameLowerCase = headerName.toLowerCase()
+      if (!allowedHeaderArray.includes(headerNameLowerCase)) {
+        allowedHeaderArray.push(headerNameLowerCase)
+        if (!vary.includes("access-control-request-headers")) {
+          vary.push("access-control-request-headers")
+        }
+      }
+    })
+  }
+
+  return {
+    "access-control-allow-origin": allowedOriginArray.join(", "),
+    "access-control-allow-methods": allowedMethodArray.join(", "),
+    "access-control-allow-headers": allowedHeaderArray.join(", "),
+    "access-control-allow-credentials": accessControlAllowCredentials,
+    "access-control-max-age": accessControlMaxAge,
+    ...(vary.length ? { vary: vary.join(", ") } : {}),
+  }
 }

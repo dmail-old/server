@@ -193,138 +193,137 @@ const response = {
 }
 ```
 
-## cors
+## accessControl options
 
 ```js
 import { startServer } from "@dmail/server"
 
 startServer({
-  cors: true,
+  accessControlAllowRequestOrigin: true,
+  accessControlAllowRequestMethod: true,
+  accessControlAllowRequestHeaders: true,
+  accessControlAllowCredentials: true,
 })
 ```
 
-When true, sever adds cross origin ressource sharing headers to all your responses. It means your server can be requested from an other domain.
+All options starting with `accessControl` are related to cross origin ressource sharing, also called CORS.<br />
+As soon as you pass `accessControlAllowRequestOrigin` or `accessControlAllowedOrigins` it means your server use CORS.<br />
+When using CORS all your response will contain CORS headers, even a 500 response.
 
-If you don't pass `cors` option, its value will be:
-
-```js
-false
-```
-
-The following options can be used when `cors` is true:
-
-### cors + accessControlAllowedOrigins
+### accessControlAllowedOrigins
 
 ```js
 import { startServer } from "@dmail/server"
 
 startServer({
-  cors: true,
   accessControlAllowedOrigins: ["http://127.0.0.1:80"],
 })
 ```
 
+Origins inside this array will be allowed.<br />
 If you don't pass `accessControlAllowedOrigins` option, its value will be:
 
-```json
+<!-- prettier-ignore -->
+```js
 []
 ```
 
-### cors + accessControlAllowRequestOrigin
+### accessControlAllowRequestOrigin
 
 ```js
 import { startServer } from "@dmail/server"
 
 startServer({
-  cors: true,
   accessControlAllowRequestOrigin: true,
 })
 ```
 
-Pass this option to true will allow request from any origin.
+When true, any request origin will be allowed.<br />
 If you don't pass `accessControlAllowRequestOrigin` option, its value will be:
 
 ```js
 false
 ```
 
-### cors + accessControlAllowedMethods
+### accessControlAllowedMethods
 
 ```js
 import { startServer } from "@dmail/server"
 
 startServer({
-  cors: true,
+  accessControlAllowRequestOrigin: true,
   accessControlAllowedMethods: ["GET"],
 })
 ```
 
+Method names inside this array will be allowed.<br />
 If you don't pass `accessControlAllowedMethods` option, its value will be:
 
 ```json
 ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 ```
 
-### cors + accessControlAllowRequestMethod
+### accessControlAllowRequestMethod
 
 ```js
 import { startServer } from "@dmail/server"
 
 startServer({
-  cors: true,
-  accessControlAllowedMethods: ["GET"],
+  accessControlAllowRequestOrigin: true,
+  accessControlAllowRequestMethod: true,
 })
 ```
 
-Pass this option to true will allow any request method.
+When true, any request method will be allowed.<br />
 If you don't pass `accessControlAllowRequestMethod` option, its value will be:
 
 ```js
 false
 ```
 
-### cors + accessControlAllowedHeaders
+### accessControlAllowedHeaders
 
 ```js
 import { startServer } from "@dmail/server"
 
 startServer({
-  cors: true,
+  accessControlAllowRequestOrigin: true,
   accessControlAllowedHeaders: ["x-whatever"],
 })
 ```
 
+Header names inside this array will be allowed.<br />
 If you don't pass `accessControlAllowedHeaders` option, its value will be:
 
 ```json
 ["x-requested-with"]
 ```
 
-### cors + accessControlAllowRequestHeaders
+### accessControlAllowRequestHeaders
 
 ```js
 import { startServer } from "@dmail/server"
 
 startServer({
-  cors: true,
+  accessControlAllowRequestOrigin: true,
   accessControlAllowRequestHeaders: true,
 })
 ```
 
-Pass this option to true will allow any request headers.
+When true, any request headers will be allowed.<br />
 If you don't pass `accessControlAllowRequestHeaders` option, its value will be:
 
 ```js
 false
 ```
 
-### cors + accessControlAllowCredentials
+### accessControlAllowCredentials
 
 ```js
 import { startServer } from "@dmail/server"
 
 startServer({
-  cors: true,
+  accessControlAllowRequestOrigin: true,
   accessControlAllowCredentials: true,
 })
 ```
@@ -332,16 +331,16 @@ startServer({
 If you don't pass `accessControlAllowCredentials` option, its value will be:
 
 ```js
-true
+false
 ```
 
-### cors + accessControlMaxAge
+### accessControlMaxAge
 
 ```js
 import { startServer } from "@dmail/server"
 
 startServer({
-  cors: true,
+  accessControlAllowRequestOrigin: true,
   accessControlMaxAge: 400,
 })
 ```
@@ -411,22 +410,22 @@ If you don't pass `stopOnExit` option, its value will be:
 true
 ```
 
-## stopOnError
+## stopOnInternalError
 
 ```js
 import { startServer } from "@dmail/server"
 
 startServer({
-  stopOnError: false,
+  stopOnInternalError: true,
 })
 ```
 
 When true, server will be stopped if a request produce a response with a 500 status.
 
-If you don't pass `stopOnError` option, its value will be:
+If you don't pass `stopOnInternalError` option, its value will be:
 
 ```js
-true
+false
 ```
 
 ## keepProcessAlive
