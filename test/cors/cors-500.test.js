@@ -12,6 +12,7 @@ const server = await startServer({
   accessControlAllowRequestMethod: true,
   accessControlAllowRequestHeaders: true,
   accessControlAllowedMethods: [],
+  accessControlAllowCredentials: true,
   accessControlMaxAge: 400,
   keepProcessAlive: false,
   requestToResponse: () => {
@@ -35,7 +36,7 @@ const body = await response.json()
 const actual = { headers, body }
 const expected = {
   headers: {
-    "access-control-allow-credentials": "false",
+    "access-control-allow-credentials": "true",
     "access-control-allow-headers": "x-requested-with, x-whatever",
     "access-control-allow-methods": "GET",
     "access-control-allow-origin": "http://example.com:80",

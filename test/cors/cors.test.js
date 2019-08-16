@@ -39,7 +39,6 @@ response.headers.forEach((value, key) => {
 })
 const actual = headers
 const expected = {
-  "access-control-allow-credentials": "false",
   "access-control-allow-headers": "x-requested-with, x-whatever",
   "access-control-allow-methods": "GET",
   "access-control-allow-origin": "http://example.com:80",

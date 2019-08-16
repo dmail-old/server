@@ -442,7 +442,7 @@ const generateAccessControlHeaders = ({
     "access-control-allow-origin": allowedOriginArray.join(", "),
     "access-control-allow-methods": allowedMethodArray.join(", "),
     "access-control-allow-headers": allowedHeaderArray.join(", "),
-    "access-control-allow-credentials": accessControlAllowCredentials,
+    ... accessControlAllowCredentials ? {"access-control-allow-credentials": true} : {},
     "access-control-max-age": accessControlMaxAge,
     ...(vary.length ? { vary: vary.join(", ") } : {}),
   }
