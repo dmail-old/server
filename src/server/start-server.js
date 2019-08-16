@@ -146,7 +146,7 @@ export const startServer = async ({
     await stopListening(nodeServer)
     status = "stopped"
     stoppedCallback({ reason })
-    stoppedResolve()
+    stoppedResolve(reason)
   })
   const startOperation = createStoppableOperation({
     cancellationToken,
