@@ -1,5 +1,5 @@
-import { createReadStream } from "fs"
-import { folderRead, fileStat, fileRead } from "@dmail/helper"
+import { createReadStream, readFile } from "fs"
+import { folderRead, fileStat } from "@dmail/helper"
 import {
   operatingSystemPathToPathname,
   pathnameToOperatingSystemPath,
@@ -7,7 +7,7 @@ import {
 import { hrefToPathname } from "@jsenv/module-resolution"
 import { ressourceToContentType } from "../ressource/index.js"
 import { contentTypeMap as defaultContentTypeMap } from "./content-type-map.js"
-import { createETag } from "./etag.js"
+import { bufferToEtag } from "./bufferToEtag.js"
 import { convertFileSystemErrorToResponseProperties } from "./convertFileSystemErrorToResponseProperties.js"
 
 export const serveFile = async (
@@ -95,8 +95,8 @@ export const serveFile = async (
     }
 
     if (cacheWithETag) {
-      const content = await fileRead(filesystemPath)
-      const eTag = createETag(content)
+      const buffer = await readFileAsBuffer(filesystemPath)
+      const eTag = bufferToEtag(buffer)
 
       if ("if-none-match" in headers && headers["if-none-match"] === eTag) {
         return {
@@ -115,7 +115,7 @@ export const serveFile = async (
           "content-type": ressourceToContentType(filesystemPath, contentTypeMap),
           etag: eTag,
         },
-        body: content,
+        body: buffer,
       }
     }
 
@@ -141,3 +141,11 @@ const dateToSecondsPrecision = (date) => {
   dateWithSecondsPrecision.setMilliseconds(0)
   return dateWithSecondsPrecision
 }
+
+const readFileAsBuffer = (path) =>
+  new Promise((resolve, reject) => {
+    readFile(path, (error, buffer) => {
+      if (error) reject(error)
+      else resolve(buffer)
+    })
+  })

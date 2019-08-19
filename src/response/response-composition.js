@@ -26,6 +26,7 @@ const responseCompositionMapping = {
   statusText: (prevStatusText, statusText) => statusText,
   headers: composeResponseHeaders,
   body: (prevBody, body) => body,
+  bodyEncoding: (prevEncoding, encoding) => encoding,
 }
 
 export const composeResponse = compositionMappingToComposeStrict(responseCompositionMapping)

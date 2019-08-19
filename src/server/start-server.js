@@ -252,6 +252,7 @@ export const startServer = async ({
       statusText = statusToStatusText(status),
       headers = {},
       body = "",
+      bodyEncoding,
     }) => {
       if (corsEnabled) {
         const accessControlHeaders = generateAccessControlHeaders({
@@ -271,6 +272,7 @@ export const startServer = async ({
           statusText,
           headers: composeResponseHeaders(headers, accessControlHeaders),
           body,
+          bodyEncoding,
         }
       }
 
@@ -279,6 +281,7 @@ export const startServer = async ({
         statusText,
         headers,
         body,
+        bodyEncoding,
       }
     }
 

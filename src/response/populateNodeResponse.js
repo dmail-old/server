@@ -8,7 +8,7 @@ import {
 
 export const populateNodeResponse = (
   nodeResponse,
-  { status, statusText, headers, body },
+  { status, statusText, headers, body, bodyEncoding },
   { ignoreBody },
 ) => {
   const nodeHeaders = headersToNodeHeaders(headers)
@@ -22,6 +22,10 @@ export const populateNodeResponse = (
   if (ignoreBody) {
     nodeResponse.end()
     return
+  }
+
+  if (bodyEncoding) {
+    nodeResponse.setEncoding(bodyEncoding)
   }
 
   const observable = bodyToObservable(body)

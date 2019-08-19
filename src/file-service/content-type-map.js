@@ -15,6 +15,9 @@ export const contentTypeMap = {
   "application/x-gzip": {
     extensions: ["gz"],
   },
+  "application/wasm": {
+    extensions: ["wasm"],
+  },
   "application/zip": {
     extensions: ["zip"],
   },
