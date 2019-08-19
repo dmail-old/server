@@ -1,4 +1,5 @@
 export { serveFile } from "./serve-file.js"
+export { bufferToEtag } from "./bufferToEtag.js"
 export {
   convertFileSystemErrorToResponseProperties,
 } from "./convertFileSystemErrorToResponseProperties.js"

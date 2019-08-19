@@ -23,6 +23,7 @@ export {
 
 export {
   serveFile,
+  bufferToEtag,
   defaultContentTypeMap,
   convertFileSystemErrorToResponseProperties,
 } from "./src/file-service/index.js"
