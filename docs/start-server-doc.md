@@ -131,7 +131,7 @@ const request = {
 When request method is `GET` or `HEAD`, `request.body` is `undefined`.<br />
 When request method is `POST`, `PUT`, `PATCH`, `request.body` is an observable object.<br />
 
-Here is how you could read `request.body`:
+Here is how to get `request.body` as string:
 
 ```js
 const requestToResponse = async ({ body }) => {
@@ -161,6 +161,16 @@ const response = {
   status: 200,
   headers: { "content-type": "text/plain" },
   body: "Hello world",
+}
+```
+
+A response with a buffer body:
+
+```js
+const response = {
+  status: 200,
+  headers: { "content-type": "text/plain" },
+  body: Buffer.from("Hello world")
 }
 ```
 

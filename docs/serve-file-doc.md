@@ -4,7 +4,7 @@
 Example:
 
 ```js
-import { serveFile, defaultContentTypeMap } from "@dmail/server"
+import { serveFile } from "@dmail/server"
 
 const response = await serveFile("/Users/you/folder/index.html", {
   method: "GET",
@@ -12,12 +12,6 @@ const response = await serveFile("/Users/you/folder/index.html", {
     "if-modified-since": "Wed, 21 Oct 2015 07:28:00 GMT",
   },
   cacheStrategy: "mtime",
-  contentTypeMap: {
-    ...defaultContentTypeMap,
-    "application/json": {
-      extensions: ["json", "json2"],
-    },
-  },
 })
 ```
 
@@ -41,7 +35,7 @@ When method is not `HEAD` or `GET` the returned response correspond to `501 not 
 
 ### headers
 
-Two header will be checked in this optionnal object: `if-modified-since` and `if-none-match`.
+Two header might be checked in this optionnal object: `if-modified-since` and `if-none-match`. They will be checked according to `cacheStrategy` below.
 
 ### cacheStrategy
 
@@ -52,6 +46,20 @@ When `"none"`: response will contain `"cache-control": "no-store"` header<br />
 Default value: `"etag"`.
 
 ### contentTypeMap
+
+```js
+import { serveFile } from "@dmail/server"
+
+const response = await serveFile("/Users/you/folder/index.html", {
+  method: "GET",
+  contentTypeMap: {
+    ...defaultContentTypeMap,
+    "application/x-whatever": {
+      extensions: ["whatever", "whatever-2"],
+    },
+  },
+})
+```
 
 There is a defaultContentTypeMap for well known mapping between file extension and content type header.<br />
 You can use this option to override it.
