@@ -17,6 +17,7 @@ import { composeResponse } from "../index.js"
       foo: false,
     },
     body: undefined,
+    bodyEncoding: undefined,
   }
   assert({
     actual,
@@ -46,6 +47,7 @@ import { composeResponse } from "../index.js"
       "content-type": "application/javascript",
     },
     body: undefined,
+    bodyEncoding: undefined,
   }
   assert({
     actual,

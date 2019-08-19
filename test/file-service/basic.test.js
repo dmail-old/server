@@ -13,15 +13,14 @@ const filePathname = `${operatingSystemPathToPathname(testFolderPath)}${ressourc
 const actual = await serveFile(filePathname, {
   cacheStrategy: "etag",
 })
-const content = String(readFileSync(`${testFolderPath}/file.js`))
-const length = Buffer.byteLength(content)
+const bodyAsBuffer = readFileSync(`${testFolderPath}/file.js`)
 const expected = {
   status: 200,
   headers: {
-    "content-length": length,
+    "content-length": bodyAsBuffer.length,
     "content-type": "application/javascript",
     etag: `"20-cXagzQt5IlWM1Fc0XXcmMtPeNKo"`,
   },
-  body: content,
+  body: bodyAsBuffer,
 }
 assert({ actual, expected })
