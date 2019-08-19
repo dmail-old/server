@@ -170,7 +170,7 @@ A response with a buffer body:
 const response = {
   status: 200,
   headers: { "content-type": "text/plain" },
-  body: Buffer.from("Hello world")
+  body: Buffer.from("Hello world"),
 }
 ```
 
