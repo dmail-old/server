@@ -41,19 +41,19 @@
 		"kill-port": "1.5.1"
 	},
 	"devDependencies": {
+		"@dmail/assert": "3.14.0",
+		"@jsenv/bundling": "3.1.0",
+		"@jsenv/codecov-upload": "1.7.0",
+		"@jsenv/eslint-config": "9.9.0",
 		"@jsenv/execution": "3.1.0",
 		"@jsenv/testing": "2.2.0",
-		"@jsenv/bundling": "3.1.0",
 		"@jsenv/node-launcher": "1.18.0",
 		"@jsenv/node-module-import-map": "5.1.0",
-		"@jsenv/eslint-config": "9.9.0",
 		"@jsenv/prettier-config": "1.0.0",
 		"@jsenv/prettier-check-project": "3.3.0",
-		"@jsenv/codecov-upload": "1.7.0",
-		"@dmail/assert": "3.14.0",
+		"eslint": "6.2.2",
 		"node-fetch": "2.6.0",
 		"node-forge": "0.8.5",
-		"eslint": "6.2.2",
 		"prettier": "1.18.2",
 		"rimraf": "3.0.0"
 	}
