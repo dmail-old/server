@@ -12,14 +12,14 @@ import {
   registerUnadvisedProcessCrashCallback,
   registerUngaranteedProcessTeardown,
 } from "@dmail/process-signals"
-import { hrefToOrigin } from "@jsenv/module-resolution"
+import { hrefToOrigin } from "@jsenv/href"
+import { createLogger } from "@jsenv/logger"
 import { trackConnections, trackClients, trackRequestHandlers } from "../trackers/index.js"
 import { nodeRequestToRequest } from "../request/index.js"
 import { populateNodeResponse, composeResponseHeaders, composeResponse } from "../response/index.js"
 import { colorizeResponseStatus } from "./colorizeResponseStatus.js"
 import { originAsString } from "./originAsString.js"
 import { listen, stopListening } from "./listen.js"
-import { createLogger, LOG_LEVEL_ERRORS_WARNINGS_AND_LOGS } from "./logger.js"
 import {
   STOP_REASON_INTERNAL_ERROR,
   STOP_REASON_PROCESS_SIGINT,
@@ -65,7 +65,7 @@ export const startServer = async ({
   // by default OPTIONS request can be cache for a long time, it's not going to change soon ?
   // we could put a lot here, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
   accessControlMaxAge = 600,
-  logLevel = LOG_LEVEL_ERRORS_WARNINGS_AND_LOGS,
+  logLevel,
   sendInternalErrorStack = false,
   internalErrorToResponseProperties = (error) => {
     const body = error
@@ -93,7 +93,7 @@ export const startServer = async ({
   if (ip === "0.0.0.0" && process.platform === "win32")
     throw new Error(`listening ${ip} not available on window`)
 
-  const { log, logError } = createLogger({ logLevel })
+  const logger = createLogger({ logLevel })
 
   if (forcePort) {
     await createOperation({
@@ -140,7 +140,7 @@ export const startServer = async ({
   })
   const stop = memoizeOnce(async (reason = STOP_REASON_NOT_SPECIFIED) => {
     status = "closing"
-    log(`server stopped because ${reason}`)
+    logger.info(`server stopped because ${reason}`)
 
     await cleanup(reason)
     await stopListening(nodeServer)
@@ -197,7 +197,7 @@ export const startServer = async ({
   port = await startOperation
   status = "opened"
   const origin = originAsString({ protocol, ip, port })
-  log(`server started at ${origin}`)
+  logger.info(`server started at ${origin}`)
   startedCallback({ origin })
 
   // nodeServer.on("upgrade", (request, socket, head) => {
@@ -220,18 +220,18 @@ export const startServer = async ({
       response.headers["content-length"] > 0 &&
       response.body === ""
     ) {
-      logError(
+      logger.error(
         createContentLengthMismatchError(
           `content-length header is ${response.headers["content-length"]} but body is empty`,
         ),
       )
     }
 
-    log(`${request.method} ${request.origin}${request.ressource}`)
+    logger.info(`${request.method} ${request.origin}${request.ressource}`)
     if (error) {
-      logError(error)
+      logger.error(error)
     }
-    log(`${colorizeResponseStatus(response.status)} ${response.statusText}`)
+    logger.info(`${colorizeResponseStatus(response.status)} ${response.statusText}`)
     populateNodeResponse(nodeResponse, response, {
       ignoreBody: request.method === "HEAD",
     })
@@ -244,7 +244,7 @@ export const startServer = async ({
     const request = nodeRequestToRequest(nodeRequest, origin)
 
     nodeRequest.on("error", (error) => {
-      logError("error on", request.ressource, error)
+      logger.error("error on", request.ressource, error)
     })
 
     const responsePropertiesToResponse = ({

@@ -1,5 +1,5 @@
 import { fileWrite } from "@dmail/helper"
-import { hrefToPathname, pathnameToDirname } from "@jsenv/module-resolution"
+import { hrefToPathname, pathnameToDirname } from "@jsenv/href"
 import { pathnameToOperatingSystemPath } from "@jsenv/operating-system-path"
 import { createSelfSignature } from "./createSelfSignature.js"
 

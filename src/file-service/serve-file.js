@@ -4,7 +4,7 @@ import {
   operatingSystemPathToPathname,
   pathnameToOperatingSystemPath,
 } from "@jsenv/operating-system-path"
-import { hrefToPathname } from "@jsenv/module-resolution"
+import { hrefToPathname } from "@jsenv/href"
 import { ressourceToContentType } from "../ressource/index.js"
 import { contentTypeMap as defaultContentTypeMap } from "./content-type-map.js"
 import { bufferToEtag } from "./bufferToEtag.js"

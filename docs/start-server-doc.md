@@ -366,25 +366,20 @@ If you don't pass `accessControlMaxAge` option, its value will be:
 ## logLevel
 
 ```js
-import {
-  startServer,
-  LOG_LEVEL_OFF,
-  LOG_LEVEL_ERRORS,
-  LOG_LEVEL_ERRORS_AND_WARNINGS,
-  LOG_LEVEL_ERRORS_WARNINGS_AND_LOGS,
-  LOG_LEVEL_MAXIMUM,
-} from "@dmail/server"
+import { startServer } from "@dmail/server"
 
 startServer({
-  logLevel: LOG_LEVEL_OFF,
+  logLevel: "off",
 })
 ```
 
 If you don't pass `logLevel` option, its value will be:
 
 ```js
-LOG_LEVEL_ERRORS_WARNINGS_AND_LOGS
+"info"
 ```
+
+— see [`@jsenv/logger` on github](https://github.com/jsenv/jsenv-logger)
 
 ## stopOnSIGINT
 
