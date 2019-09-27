@@ -1,6 +1,6 @@
 {
 	"name": "@dmail/server",
-	"version": "2.9.0",
+	"version": "2.10.0",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -38,23 +38,23 @@
 		"@dmail/process-signals": "1.1.0",
 		"@jsenv/href": "1.0.0",
 		"@jsenv/logger": "1.0.0",
-		"@jsenv/operating-system-path": "2.4.0",
-		"kill-port": "1.5.1"
+		"@jsenv/operating-system-path": "2.5.0",
+		"kill-port": "1.5.2"
 	},
 	"devDependencies": {
 		"@dmail/assert": "3.14.0",
-		"@jsenv/bundling": "4.2.0",
-		"@jsenv/codecov-upload": "1.7.0",
-		"@jsenv/eslint-config": "10.0.0",
-		"@jsenv/execution": "4.2.0",
-		"@jsenv/testing": "2.7.0",
-		"@jsenv/node-launcher": "4.5.0",
-		"@jsenv/node-module-import-map": "6.4.0",
+		"@jsenv/bundling": "6.2.0",
+		"@jsenv/codecov-upload": "1.9.0",
+		"@jsenv/eslint-config": "10.1.0",
+		"@jsenv/execution": "5.13.0",
+		"@jsenv/testing": "3.4.0",
+		"@jsenv/node-launcher": "4.17.0",
+		"@jsenv/node-module-import-map": "7.1.0",
 		"@jsenv/prettier-config": "1.0.0",
-		"@jsenv/prettier-check-project": "3.4.0",
-		"eslint": "6.3.0",
+		"@jsenv/prettier-check-project": "3.5.0",
+		"eslint": "6.4.0",
 		"node-fetch": "2.6.0",
-		"node-forge": "0.8.5",
+		"node-forge": "0.9.1",
 		"prettier": "1.18.2",
 		"rimraf": "3.0.0"
 	}
