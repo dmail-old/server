@@ -52,28 +52,6 @@ Api can be found in their own pages
 - [firstService](./docs/first-service.md)
 - [serveFile](./docs/serve-file.md)
 
-## `serveFile` example
-
-The following code starts a server listening to `http://127.0.0.1:8080` serving files of the current directory.
-
-```js
-import { startServer, serveFile } from "@dmail/server"
-
-startServer({
-  protocol: "http",
-  ip: "127.0.0.1",
-  port: 8080,
-  requestToResponse: ({ ressource, method, headers }) =>
-    serveFile(`${__dirname}${ressource}`, {
-      method,
-      headers,
-    }),
-})
-```
-
-If you want to know more about `serveFile`, there is a dedicated page documenting it.<br />
-— see [`serveFile` documentation](./docs/serve-file-doc.md)
-
 ## Installation
 
 ```console

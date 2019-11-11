@@ -27,7 +27,7 @@ const response = await serveFile("/Users/you/folder/index.html", {
 })
 ```
 
-Most often you will populate `method` and `headers` with a request like this:
+`serveFile` was designe to produce a response and called inside `requestToResponse` like this:
 
 ```js
 import { serveFile, startServer } from "@dmail/server"
