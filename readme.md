@@ -4,19 +4,24 @@
 [![build](https://travis-ci.com/dmail/server.svg?branch=master)](http://travis-ci.com/dmail/server)
 [![codecov](https://codecov.io/gh/dmail/server/branch/master/graph/badge.svg)](https://codecov.io/gh/dmail/server)
 
-> Simplified api to create server using node.js.
+Simplified api to create server using node.js.
 
-## Introduction
+## Table of contents
 
-`@dmail/server` is used to start a node.js server.<br />
+- [Presentation](#Presentation)
+- [Code example](#Code-example)
+- [api](#api)
+  - [startServer](./docs/start-server.md)
+  - [firstService](./docs/first-service.md)
+  - [serveFile](./docs/serve-file.md)
 
-The main exports are:
+## Presentation
 
-- `startServer`
-- `firstService`
-- `serveFile`
+dmail/server github repository publishes `@dmail/server` package on github and npm package registries.
 
-## `startServer` Example
+`@dmail/server` helps to start server with a simplified api to focus on writing your application code. The api make your code easier to compose and test in isolation.
+
+## Code example
 
 The following code starts a server listening to `http://127.0.0.1:8080` responding `Hello world` as plain text.
 
@@ -39,8 +44,13 @@ startServer({
 })
 ```
 
-If you want to know more about `startServer`, there is a dedicated page documenting it.<br />
-— see [`startServer` documentation](./docs/start-server-doc.md)
+## api
+
+Api can be found in their own pages
+
+- [startServer](./docs/start-server.md)
+- [firstService](./docs/first-service.md)
+- [serveFile](./docs/serve-file.md)
 
 ## `serveFile` example
 
@@ -63,33 +73,6 @@ startServer({
 
 If you want to know more about `serveFile`, there is a dedicated page documenting it.<br />
 — see [`serveFile` documentation](./docs/serve-file-doc.md)
-
-## `firstService` example
-
-Let's make a `generateResponse` function with the following behaviour:
-
-- returns `204 no content` response for `/`
-- returns `200 ok` response for `/whatever`
-
-```js
-import { firstService } from "@dmail/server"
-
-const generateResponse = (request) => {
-  return firstService(
-    () => {
-      if (ressource !== "/") return null
-      return { status: 204 }
-    },
-    () => {
-      if (ressource !== "/whatever") return null
-      return { status: 200 }
-    },
-  )
-}
-```
-
-If you want to know more about `firstService`, there is a dedicated page documenting it.<br />
-— see [`firstService` documentation](./docs/first-service-doc.md)
 
 ## Installation
 

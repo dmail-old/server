@@ -327,6 +327,7 @@ export const startServer = async ({
     getStatus: () => status,
     origin,
     nodeServer,
+    // TODO: remove agent
     agent,
     stop,
     stoppedPromise,
